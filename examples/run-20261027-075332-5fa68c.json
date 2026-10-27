@@ -1,0 +1,1369 @@
+{
+ "run_id": "run-20261027-075332-5fa68c",
+ "question": "Find the most dangerous hidden dependency in our supply chain.",
+ "created": 1793087612.9701583,
+ "evidence": {
+  "E1": {
+   "tool": "inspect_schema",
+   "args": {},
+   "purpose": "Understand database tables and columns relevant to supply-chain dependency analysis.",
+   "result": {
+    "summary": "TPCDS_DB has 24 tables. Checked the columns of: item, store_sales, customer_address, store, date_dim.",
+    "queries": [
+     {
+      "sql": "SHOW LIGHTNING TABLES TPCDS_DB",
+      "ms": 1799,
+      "cached": true,
+      "ran_at": "2026-10-26T13:12:57Z",
+      "row_count": 24
+     },
+     {
+      "sql": "SELECT * FROM TPCDS_DB.item LIMIT 1",
+      "ms": 12692,
+      "cached": true,
+      "ran_at": "2026-10-26T13:13:10Z",
+      "row_count": 1
+     },
+     {
+      "sql": "SELECT * FROM TPCDS_DB.store_sales LIMIT 1",
+      "ms": 13127,
+      "cached": true,
+      "ran_at": "2026-10-26T13:13:23Z",
+      "row_count": 1
+     },
+     {
+      "sql": "SELECT * FROM TPCDS_DB.customer_address LIMIT 1",
+      "ms": 10085,
+      "cached": true,
+      "ran_at": "2026-10-26T13:13:33Z",
+      "row_count": 1
+     },
+     {
+      "sql": "SELECT * FROM TPCDS_DB.store LIMIT 1",
+      "ms": 8474,
+      "cached": true,
+      "ran_at": "2026-10-26T13:13:41Z",
+      "row_count": 1
+     },
+     {
+      "sql": "SELECT * FROM TPCDS_DB.date_dim LIMIT 1",
+      "ms": 9935,
+      "cached": true,
+      "ran_at": "2026-10-26T13:13:51Z",
+      "row_count": 1
+     }
+    ],
+    "rows": [],
+    "scope": "Store sales channel only (catalog and web sales not included).",
+    "tables": [
+     "call_center",
+     "catalog_page",
+     "catalog_returns",
+     "catalog_sales",
+     "customer",
+     "customer_address",
+     "customer_demographics",
+     "date_dim",
+     "household_demographics",
+     "income_band",
+     "inventory",
+     "item",
+     "promotion",
+     "reason",
+     "ship_mode",
+     "store",
+     "store_returns",
+     "store_sales",
+     "time_dim",
+     "warehouse",
+     "web_page",
+     "web_returns",
+     "web_sales",
+     "web_site"
+    ],
+    "checked": {
+     "item": {
+      "columns": [
+       "i_item_sk",
+       "i_item_id",
+       "i_rec_start_date",
+       "i_rec_end_date",
+       "i_item_desc",
+       "i_current_price",
+       "i_wholesale_cost",
+       "i_brand_id",
+       "i_brand",
+       "i_class_id",
+       "i_class",
+       "i_category_id",
+       "i_category",
+       "i_manufact_id",
+       "i_manufact",
+       "i_size",
+       "i_formulation",
+       "i_color",
+       "i_units",
+       "i_container",
+       "i_manager_id",
+       "i_product_name"
+      ],
+      "required_present": [
+       "i_item_sk",
+       "i_manufact_id",
+       "i_manufact",
+       "i_category",
+       "i_class"
+      ],
+      "required_missing": []
+     },
+     "store_sales": {
+      "columns": [
+       "ss_sold_date_sk",
+       "ss_sold_time_sk",
+       "ss_item_sk",
+       "ss_customer_sk",
+       "ss_cdemo_sk",
+       "ss_hdemo_sk",
+       "ss_addr_sk",
+       "ss_store_sk",
+       "ss_promo_sk",
+       "ss_ticket_number",
+       "ss_quantity",
+       "ss_wholesale_cost",
+       "ss_list_price",
+       "ss_sales_price",
+       "ss_ext_discount_amt",
+       "ss_ext_sales_price",
+       "ss_ext_wholesale_cost",
+       "ss_ext_list_price",
+       "ss_ext_tax",
+       "ss_coupon_amt",
+       "ss_net_paid",
+       "ss_net_paid_inc_tax",
+       "ss_net_profit"
+      ],
+      "required_present": [
+       "ss_item_sk",
+       "ss_customer_sk",
+       "ss_store_sk",
+       "ss_addr_sk",
+       "ss_ticket_number",
+       "ss_ext_sales_price",
+       "ss_sold_date_sk"
+      ],
+      "required_missing": []
+     },
+     "customer_address": {
+      "columns": [
+       "ca_address_sk",
+       "ca_address_id",
+       "ca_street_number",
+       "ca_street_name",
+       "ca_street_type",
+       "ca_suite_number",
+       "ca_city",
+       "ca_county",
+       "ca_state",
+       "ca_zip",
+       "ca_country",
+       "ca_gmt_offset",
+       "ca_location_type"
+      ],
+      "required_present": [
+       "ca_address_sk",
+       "ca_state"
+      ],
+      "required_missing": []
+     },
+     "store": {
+      "columns": [
+       "s_store_sk",
+       "s_store_id",
+       "s_rec_start_date",
+       "s_rec_end_date",
+       "s_closed_date_sk",
+       "s_store_name",
+       "s_number_employees",
+       "s_floor_space",
+       "s_hours",
+       "s_manager",
+       "s_market_id",
+       "s_geography_class",
+       "s_market_desc",
+       "s_market_manager",
+       "s_division_id",
+       "s_division_name",
+       "s_company_id",
+       "s_company_name",
+       "s_street_number",
+       "s_street_name",
+       "s_street_type",
+       "s_suite_number",
+       "s_city",
+       "s_county",
+       "s_state",
+       "s_zip",
+       "s_country",
+       "s_gmt_offset",
+       "s_tax_precentage"
+      ],
+      "required_present": [
+       "s_store_sk",
+       "s_store_name",
+       "s_state"
+      ],
+      "required_missing": []
+     },
+     "date_dim": {
+      "columns": [
+       "d_date_sk",
+       "d_date_id",
+       "d_date",
+       "d_month_seq",
+       "d_week_seq",
+       "d_quarter_seq",
+       "d_year",
+       "d_dow",
+       "d_moy",
+       "d_dom",
+       "d_qoy",
+       "d_fy_year",
+       "d_fy_quarter_seq",
+       "d_fy_week_seq",
+       "d_day_name",
+       "d_quarter_name",
+       "d_holiday",
+       "d_weekend",
+       "d_following_holiday",
+       "d_first_dom",
+       "d_last_dom",
+       "d_same_day_ly",
+       "d_same_day_lq",
+       "d_current_day",
+       "d_current_week",
+       "d_current_month",
+       "d_current_quarter",
+       "d_current_year"
+      ],
+      "required_present": [
+       "d_date_sk",
+       "d_date"
+      ],
+      "required_missing": []
+     }
+    }
+   }
+  },
+  "E2": {
+   "tool": "observed_period",
+   "args": {},
+   "purpose": "Get first/last sale date and total store sales to understand the timeframe and baseline.",
+   "result": {
+    "summary": "Store sales run from 1998-01-02 to 2003-01-02.",
+    "queries": [
+     {
+      "sql": "SELECT MIN(d.d_date) AS first_sale_date, MAX(d.d_date) AS last_sale_date, COUNT(*) AS sales_lines, SUM(s.ss_ext_sales_price) AS total_sales_value FROM TPCDS_DB.store_sales s JOIN TPCDS_DB.date_dim d ON s.ss_sold_date_sk = d.d_date_sk",
+      "ms": 25999,
+      "cached": true,
+      "ran_at": "2026-10-26T13:46:35Z",
+      "row_count": 1
+     }
+    ],
+    "rows": [
+     {
+      "first_sale_date": "1998-01-02",
+      "last_sale_date": "2003-01-02",
+      "sales_lines": 2750311,
+      "total_sales_value": 5141055996.1899
+     }
+    ],
+    "scope": "Store sales channel only (catalog and web sales not included)."
+   }
+  },
+  "E3": {
+   "tool": "rank_dependency_candidates",
+   "args": {
+    "order_by": "receipt_reach",
+    "limit": 10
+   },
+   "purpose": "Rank manufacturers by receipt reach (share of customer receipts containing their products) to find hidden dependencies.",
+   "result": {
+    "summary": "Top 10 manufacturers ordered by receipt_reach. No.1: manufacturer id 207.",
+    "queries": [
+     {
+      "sql": "\n    WITH mc AS (\n      SELECT i.i_category AS cat, i.i_class AS cls, i.i_manufact_id AS m, MAX(i.i_manufact) AS name,\n             SUM(s.ss_ext_sales_price) AS r\n      FROM TPCDS_DB.store_sales s JOIN TPCDS_DB.item i ON s.ss_item_sk = i.i_item_sk\n      GROUP BY i.i_category, i.i_class, i.i_manufact_id\n    ), t AS (\n      SELECT cat, cls, m, name, r, (COALESCE(TRIM(cat), '') <> '' AND COALESCE(TRIM(cls), '') <> '') AS known_class,\n             SUM(r) OVER (PARTITION BY cat, cls) AS class_total,\n             COUNT(m) OVER (PARTITION BY cat, cls) AS known_makers_in_class,\n             RANK() OVER (PARTITION BY cat, cls ORDER BY r DESC) AS rk\n      FROM mc\n    ), agg AS (\n      SELECT m, MAX(name) AS name, SUM(r) AS revenue,\n             MAX(CASE WHEN known_class THEN r / class_total END) AS max_class_share,\n             SUM(CASE WHEN m IS NOT NULL AND known_class AND known_makers_in_class = 1 THEN 1 ELSE 0 END)\n               AS sole_source_classes,\n             SUM(CASE WHEN known_class AND rk = 1 THEN 1 ELSE 0 END) AS classes_led,\n             SUM(CASE WHEN known_class THEN 1 ELSE 0 END) AS classes_present\n      FROM t GROUP BY m\n    ), reach AS (\n      SELECT i.i_manufact_id AS m, COUNT(DISTINCT s.ss_ticket_number) AS receipts,\n             COUNT(DISTINCT s.ss_customer_sk) AS customers\n      FROM TPCDS_DB.store_sales s JOIN TPCDS_DB.item i ON s.ss_item_sk = i.i_item_sk\n      GROUP BY i.i_manufact_id\n    ), total AS (\n      SELECT SUM(r) AS grand, SUM(CASE WHEN known_class THEN 0 ELSE r END) AS unclassified FROM t\n    ), tt AS (SELECT COUNT(DISTINCT ss_ticket_number) AS all_receipts FROM TPCDS_DB.store_sales)\n    SELECT agg.m AS manufacturer_id, agg.name AS manufacturer, agg.revenue,\n           agg.revenue / total.grand AS revenue_share,\n           reach.receipts, reach.receipts / tt.all_receipts AS receipt_reach, tt.all_receipts,\n           reach.customers, agg.sole_source_classes, agg.classes_led, agg.max_class_share,\n           agg.classes_present, total.unclassified / total.grand AS unclassified_sales_share\n    FROM agg JOIN reach ON agg.m <=> reach.m CROSS JOIN total CROSS JOIN tt\n    ORDER BY CASE WHEN agg.m IS NULL THEN 0 ELSE 1 END, receipt_reach DESC, revenue DESC\n    LIMIT 11\n    ",
+      "ms": 111107,
+      "cached": true,
+      "ran_at": "2026-10-27T07:15:35Z",
+      "row_count": 11
+     }
+    ],
+    "rows": [
+     {
+      "manufacturer_id": 207,
+      "manufacturer": "oughtcallyese",
+      "revenue": 16911467.2,
+      "revenue_share": 0.0032,
+      "receipts": 9294,
+      "receipt_reach": 0.0387,
+      "all_receipts": 240000,
+      "customers": 8501,
+      "sole_source_classes": 0,
+      "classes_led": 1,
+      "max_class_share": 0.0206,
+      "classes_present": 37
+     },
+     {
+      "manufacturer_id": 158,
+      "manufacturer": "n stoughtpri",
+      "revenue": 16243387.06,
+      "revenue_share": 0.0031,
+      "receipts": 8408,
+      "receipt_reach": 0.035,
+      "all_receipts": 240000,
+      "customers": 7720,
+      "sole_source_classes": 0,
+      "classes_led": 0,
+      "max_class_share": 0.0205,
+      "classes_present": 37
+     },
+     {
+      "manufacturer_id": 116,
+      "manufacturer": "oughteseation",
+      "revenue": 14824990.2,
+      "revenue_share": 0.0028,
+      "receipts": 8038,
+      "receipt_reach": 0.0335,
+      "all_receipts": 240000,
+      "customers": 7437,
+      "sole_source_classes": 0,
+      "classes_led": 3,
+      "max_class_share": 0.0236,
+      "classes_present": 38
+     },
+     {
+      "manufacturer_id": 253,
+      "manufacturer": "priese",
+      "revenue": 14612705.38,
+      "revenue_share": 0.0028,
+      "receipts": 7854,
+      "receipt_reach": 0.0327,
+      "all_receipts": 240000,
+      "customers": 7281,
+      "sole_source_classes": 0,
+      "classes_led": 0,
+      "max_class_share": 0.028,
+      "classes_present": 36
+     },
+     {
+      "manufacturer_id": 174,
+      "manufacturer": "oughteingable",
+      "revenue": 14183215.68,
+      "revenue_share": 0.0027,
+      "receipts": 7744,
+      "receipt_reach": 0.0323,
+      "all_receipts": 240000,
+      "customers": 7084,
+      "sole_source_classes": 0,
+      "classes_led": 0,
+      "max_class_share": 0.0253,
+      "classes_present": 33
+     },
+     {
+      "manufacturer_id": 277,
+      "manufacturer": "oughteing",
+      "revenue": 14063359.72,
+      "revenue_share": 0.0027,
+      "receipts": 7713,
+      "receipt_reach": 0.0321,
+      "all_receipts": 240000,
+      "customers": 7112,
+      "sole_source_classes": 0,
+      "classes_led": 0,
+      "max_class_share": 0.0213,
+      "classes_present": 33
+     },
+     {
+      "manufacturer_id": 313,
+      "manufacturer": "prioughtpri",
+      "revenue": 14415782.36,
+      "revenue_share": 0.0027,
+      "receipts": 7631,
+      "receipt_reach": 0.0318,
+      "all_receipts": 240000,
+      "customers": 7052,
+      "sole_source_classes": 0,
+      "classes_led": 1,
+      "max_class_share": 0.026,
+      "classes_present": 31
+     },
+     {
+      "manufacturer_id": 36,
+      "manufacturer": "eseoughtpri",
+      "revenue": 13461317.45,
+      "revenue_share": 0.0026,
+      "receipts": 7488,
+      "receipt_reach": 0.0312,
+      "all_receipts": 240000,
+      "customers": 6857,
+      "sole_source_classes": 0,
+      "classes_led": 0,
+      "max_class_share": 0.0293,
+      "classes_present": 33
+     },
+     {
+      "manufacturer_id": 147,
+      "manufacturer": "oughtesecally",
+      "revenue": 14050730.66,
+      "revenue_share": 0.0027,
+      "receipts": 7469,
+      "receipt_reach": 0.0311,
+      "all_receipts": 240000,
+      "customers": 6889,
+      "sole_source_classes": 0,
+      "classes_led": 1,
+      "max_class_share": 0.0224,
+      "classes_present": 37
+     },
+     {
+      "manufacturer_id": 54,
+      "manufacturer": "eseanti",
+      "revenue": 13854085.35,
+      "revenue_share": 0.0026,
+      "receipts": 7372,
+      "receipt_reach": 0.0307,
+      "all_receipts": 240000,
+      "customers": 6819,
+      "sole_source_classes": 0,
+      "classes_led": 1,
+      "max_class_share": 0.0202,
+      "classes_present": 33
+     }
+    ],
+    "scope": "Store sales channel only (catalog and web sales not included).",
+    "data_quality": {
+     "note": "Manufacturer names are not consistent per id in this data; use manufacturer_id.",
+     "unclassified_sales_share": 0.004,
+     "unclassified_note": "Share of sales whose item has a blank category or class (excluded from class metrics).",
+     "unknown_manufacturer_revenue": 11412201.66,
+     "unknown_manufacturer_revenue_share": 0.0022,
+     "unknown_manufacturer_receipts": 6158,
+     "unknown_manufacturer_note": "Sales whose item has no manufacturer id (excluded from ranking)."
+    }
+   }
+  },
+  "E4": {
+   "tool": "manufacturer_class_profile",
+   "args": {
+    "manufacturer_id": 207
+   },
+   "purpose": "See which product classes this manufacturer sells in and its share of each class.",
+   "result": {
+    "summary": "Manufacturer 207 sells in 37 named product classes (+1 with blank category/class); No.1 in 1, sole known maker in 0.",
+    "queries": [
+     {
+      "sql": "\n    WITH mc AS (\n      SELECT i.i_category AS cat, i.i_class AS cls, i.i_manufact_id AS m,\n             SUM(s.ss_ext_sales_price) AS r, COUNT(DISTINCT i.i_item_sk) AS items\n      FROM TPCDS_DB.store_sales s JOIN TPCDS_DB.item i ON s.ss_item_sk = i.i_item_sk\n      GROUP BY i.i_category, i.i_class, i.i_manufact_id\n    ), t AS (\n      SELECT cat, cls, m, r, items, (COALESCE(TRIM(cat), '') <> '' AND COALESCE(TRIM(cls), '') <> '') AS known_class,\n             SUM(r) OVER (PARTITION BY cat, cls) AS class_total,\n             COUNT(m) OVER (PARTITION BY cat, cls) AS manufacturers_in_class,\n             RANK() OVER (PARTITION BY cat, cls ORDER BY r DESC) AS rank_in_class\n      FROM mc\n    )\n    SELECT cat AS category, cls AS class, known_class, items, r AS revenue, class_total,\n           r / class_total AS share_of_class, manufacturers_in_class, rank_in_class\n    FROM t WHERE m = 207\n    ORDER BY CASE WHEN known_class THEN 0 ELSE 1 END, share_of_class DESC\n    LIMIT 45\n    ",
+      "ms": 31787,
+      "cached": true,
+      "ran_at": "2026-10-26T13:43:33Z",
+      "row_count": 38
+     }
+    ],
+    "rows": [
+     {
+      "category": "Books",
+      "class": "reference",
+      "known_class": "true",
+      "items": 1,
+      "revenue": 750876.44,
+      "class_total": 36431501.74,
+      "share_of_class": 0.0206,
+      "manufacturers_in_class": 119,
+      "rank_in_class": 3
+     },
+     {
+      "category": "Men",
+      "class": "pants",
+      "known_class": "true",
+      "items": 6,
+      "revenue": 2499303.46,
+      "class_total": 122105343.05,
+      "share_of_class": 0.0205,
+      "manufacturers_in_class": 313,
+      "rank_in_class": 1
+     },
+     {
+      "category": "Jewelry",
+      "class": "costume",
+      "known_class": "true",
+      "items": 1,
+      "revenue": 622340.22,
+      "class_total": 32536610.53,
+      "share_of_class": 0.0191,
+      "manufacturers_in_class": 101,
+      "rank_in_class": 6
+     },
+     {
+      "category": "Electronics",
+      "class": "wireless",
+      "known_class": "true",
+      "items": 1,
+      "revenue": 600615.87,
+      "class_total": 32193724.21,
+      "share_of_class": 0.0187,
+      "manufacturers_in_class": 102,
+      "rank_in_class": 11
+     },
+     {
+      "category": "Electronics",
+      "class": "cameras",
+      "known_class": "true",
+      "items": 1,
+      "revenue": 408542.81,
+      "class_total": 29975589.96,
+      "share_of_class": 0.0136,
+      "manufacturers_in_class": 103,
+      "rank_in_class": 21
+     },
+     {
+      "category": "Sports",
+      "class": "sailing",
+      "known_class": "true",
+      "items": 2,
+      "revenue": 372657.18,
+      "class_total": 28379082.82,
+      "share_of_class": 0.0131,
+      "manufacturers_in_class": 90,
+      "rank_in_class": 25
+     },
+     {
+      "category": "Jewelry",
+      "class": "birdal",
+      "known_class": "true",
+      "items": 1,
+      "revenue": 389058.53,
+      "class_total": 30267807.23,
+      "share_of_class": 0.0129,
+      "manufacturers_in_class": 93,
+      "rank_in_class": 28
+     },
+     {
+      "category": "Books",
+      "class": "cooking",
+      "known_class": "true",
+      "items": 1,
+      "revenue": 325927.7,
+      "class_total": 28990821.71,
+      "share_of_class": 0.0112,
+      "manufacturers_in_class": 98,
+      "rank_in_class": 28
+     },
+     {
+      "category": "Home",
+      "class": "lighting",
+      "known_class": "true",
+      "items": 1,
+      "revenue": 362331.02,
+      "class_total": 32715210.35,
+      "share_of_class": 0.0111,
+      "manufacturers_in_class": 109,
+      "rank_in_class": 26
+     },
+     {
+      "category": "Jewelry",
+      "class": "custom",
+      "known_class": "true",
+      "items": 2,
+      "revenue": 371210.19,
+      "class_total": 37559013.82,
+      "share_of_class": 0.0099,
+      "manufacturers_in_class": 118,
+      "rank_in_class": 35
+     },
+     {
+      "category": "Sports",
+      "class": "tennis",
+      "known_class": "true",
+      "items": 1,
+      "revenue": 271458.39,
+      "class_total": 27848765.82,
+      "share_of_class": 0.0097,
+      "manufacturers_in_class": 94,
+      "rank_in_class": 43
+     },
+     {
+      "category": "Books",
+      "class": "parenting",
+      "known_class": "true",
+      "items": 1,
+      "revenue": 290798.07,
+      "class_total": 30702493.16,
+      "share_of_class": 0.0095,
+      "manufacturers_in_class": 100,
+      "rank_in_class": 34
+     },
+     {
+      "category": "Books",
+      "class": "home repair",
+      "known_class": "true",
+      "items": 1,
+      "revenue": 347205.8,
+      "class_total": 37169923.1,
+      "share_of_class": 0.0093,
+      "manufacturers_in_class": 108,
+      "rank_in_class": 41
+     },
+     {
+      "category": "Electronics",
+      "class": "scanners",
+      "known_class": "true",
+      "items": 1,
+      "revenue": 276879.06,
+      "class_total": 30407644.38,
+      "share_of_class": 0.0091,
+      "manufacturers_in_class": 96,
+      "rank_in_class": 45
+     },
+     {
+      "category": "Shoes",
+      "class": "mens",
+      "known_class": "true",
+      "items": 4,
+      "revenue": 1233497.98,
+      "class_total": 143070698.11,
+      "share_of_class": 0.0086,
+      "manufacturers_in_class": 363,
+      "rank_in_class": 5
+     },
+     {
+      "category": "Jewelry",
+      "class": "pendants",
+      "known_class": "true",
+      "items": 1,
+      "revenue": 287586.45,
+      "class_total": 36593330.63,
+      "share_of_class": 0.0079,
+      "manufacturers_in_class": 116,
+      "rank_in_class": 46
+     },
+     {
+      "category": "Electronics",
+      "class": "automotive",
+      "known_class": "true",
+      "items": 1,
+      "revenue": 215393.59,
+      "class_total": 28537119.33,
+      "share_of_class": 0.0075,
+      "manufacturers_in_class": 93,
+      "rank_in_class": 67
+     },
+     {
+      "category": "Sports",
+      "class": "camping",
+      "known_class": "true",
+      "items": 1,
+      "revenue": 253749.51,
+      "class_total": 34155991.85,
+      "share_of_class": 0.0074,
+      "manufacturers_in_class": 106,
+      "rank_in_class": 56
+     },
+     {
+      "category": "Shoes",
+      "class": "kids",
+      "known_class": "true",
+      "items": 2,
+      "revenue": 874713.52,
+      "class_total": 129593099.5,
+      "share_of_class": 0.0067,
+      "manufacturers_in_class": 327,
+      "rank_in_class": 15
+     },
+     {
+      "category": "Home",
+      "class": "bedding",
+      "known_class": "true",
+      "items": 1,
+      "revenue": 234550.47,
+      "class_total": 40091962.18,
+      "share_of_class": 0.0059,
+      "manufacturers_in_class": 119,
+      "rank_in_class": 71
+     },
+     {
+      "category": "Books",
+      "class": "history",
+      "known_class": "true",
+      "items": 1,
+      "revenue": 225473.66,
+      "class_total": 38829635.21,
+      "share_of_class": 0.0058,
+      "manufacturers_in_class": 113,
+      "rank_in_class": 84
+     },
+     {
+      "category": "Books",
+      "class": "romance",
+      "known_class": "true",
+      "items": 1,
+      "revenue": 188259.92,
+      "class_total": 36056851.86,
+      "share_of_class": 0.0052,
+      "manufacturers_in_class": 117,
+      "rank_in_class": 95
+     },
+     {
+      "category": "Electronics",
+      "class": "portable",
+      "known_class": "true",
+      "items": 1,
+      "revenue": 140879.34,
+      "class_total": 27273461.89,
+      "share_of_class": 0.0052,
+      "manufacturers_in_class": 91,
+      "rank_in_class": 76
+     },
+     {
+      "category": "Children",
+      "class": "school-uniforms",
+      "known_class": "true",
+      "items": 3,
+      "revenue": 588113.53,
+      "class_total": 129072402.08,
+      "share_of_class": 0.0046,
+      "manufacturers_in_class": 332,
+      "rank_in_class": 74
+     },
+     {
+      "category": "Music",
+      "class": "rock",
+      "known_class": "true",
+      "items": 1,
+      "revenue": 565873.92,
+      "class_total": 125841128.89,
+      "share_of_class": 0.0045,
+      "manufacturers_in_class": 321,
+      "rank_in_class": 76
+     },
+     {
+      "category": "Music",
+      "class": "classical",
+      "known_class": "true",
+      "items": 1,
+      "revenue": 562391.69,
+      "class_total": 147593376.38,
+      "share_of_class": 0.0038,
+      "manufacturers_in_class": 357,
+      "rank_in_class": 92
+     },
+     {
+      "category": "Shoes",
+      "class": "womens",
+      "known_class": "true",
+      "items": 1,
+      "revenue": 491893.58,
+      "class_total": 131816474.78,
+      "share_of_class": 0.0037,
+      "manufacturers_in_class": 346,
+      "rank_in_class": 91
+     },
+     {
+      "category": "Music",
+      "class": "country",
+      "known_class": "true",
+      "items": 2,
+      "revenue": 389538.0,
+      "class_total": 130959566.07,
+      "share_of_class": 0.003,
+      "manufacturers_in_class": 338,
+      "rank_in_class": 125
+     },
+     {
+      "category": "Children",
+      "class": "toddlers",
+      "known_class": "true",
+      "items": 1,
+      "revenue": 375583.88,
+      "class_total": 131788858.06,
+      "share_of_class": 0.0028,
+      "manufacturers_in_class": 351,
+      "rank_in_class": 129
+     },
+     {
+      "category": "Women",
+      "class": "swimwear",
+      "known_class": "true",
+      "items": 1,
+      "revenue": 354503.77,
+      "class_total": 134822062.03,
+      "share_of_class": 0.0026,
+      "manufacturers_in_class": 343,
+      "rank_in_class": 144
+     },
+     {
+      "category": "Home",
+      "class": "decor",
+      "known_class": "true",
+      "items": 1,
+      "revenue": 75293.05,
+      "class_total": 28692143.5,
+      "share_of_class": 0.0026,
+      "manufacturers_in_class": 95,
+      "rank_in_class": 95
+     },
+     {
+      "category": "Men",
+      "class": "accessories",
+      "known_class": "true",
+      "items": 1,
+      "revenue": 322109.43,
+      "class_total": 126468294.36,
+      "share_of_class": 0.0025,
+      "manufacturers_in_class": 339,
+      "rank_in_class": 157
+     },
+     {
+      "category": "Shoes",
+      "class": "athletic",
+      "known_class": "true",
+      "items": 2,
+      "revenue": 333312.67,
+      "class_total": 133704646.78,
+      "share_of_class": 0.0025,
+      "manufacturers_in_class": 345,
+      "rank_in_class": 157
+     },
+     {
+      "category": "Jewelry",
+      "class": "rings",
+      "known_class": "true",
+      "items": 1,
+      "revenue": 81516.95,
+      "class_total": 33645638.65,
+      "share_of_class": 0.0024,
+      "manufacturers_in_class": 98,
+      "rank_in_class": 98
+     },
+     {
+      "category": "Children",
+      "class": "infants",
+      "known_class": "true",
+      "items": 1,
+      "revenue": 274617.22,
+      "class_total": 130623757.66,
+      "share_of_class": 0.0021,
+      "manufacturers_in_class": 324,
+      "rank_in_class": 176
+     },
+     {
+      "category": "Women",
+      "class": "maternity",
+      "known_class": "true",
+      "items": 1,
+      "revenue": 225492.35,
+      "class_total": 119843059.51,
+      "share_of_class": 0.0019,
+      "manufacturers_in_class": 313,
+      "rank_in_class": 223
+     },
+     {
+      "category": "Women",
+      "class": "fragrances",
+      "known_class": "true",
+      "items": 1,
+      "revenue": 220018.05,
+      "class_total": 136118469.56,
+      "share_of_class": 0.0016,
+      "manufacturers_in_class": 347,
+      "rank_in_class": 273
+     },
+     {
+      "category": null,
+      "class": "flatware",
+      "known_class": "false",
+      "items": 1,
+      "revenue": 507899.93,
+      "class_total": 507899.93,
+      "share_of_class": 1,
+      "manufacturers_in_class": 1,
+      "rank_in_class": 1
+     }
+    ],
+    "scope": "Store sales channel only (catalog and web sales not included)."
+   }
+  },
+  "E5": {
+   "tool": "customer_dependence",
+   "args": {
+    "manufacturer_id": 207
+   },
+   "purpose": "Check customers relying on this manufacturer for >=25% / >=50% of spend.",
+   "result": {
+    "summary": "8222 customers bought from manufacturer 207; 1 relied on it for half or more of their store spend.",
+    "queries": [
+     {
+      "sql": "\n    WITH cust AS (\n      SELECT s.ss_customer_sk AS c, SUM(s.ss_ext_sales_price) AS total_spend,\n             SUM(CASE WHEN i.i_manufact_id = 207 THEN s.ss_ext_sales_price ELSE 0 END) AS m_spend\n      FROM TPCDS_DB.store_sales s JOIN TPCDS_DB.item i ON s.ss_item_sk = i.i_item_sk\n      WHERE s.ss_customer_sk IS NOT NULL\n      GROUP BY s.ss_customer_sk\n    )\n    SELECT COUNT(*) AS customers_total,\n           SUM(CASE WHEN m_spend > 0 THEN 1 ELSE 0 END) AS customers_who_bought,\n           SUM(CASE WHEN m_spend > 0 AND m_spend / total_spend >= 0.25 THEN 1 ELSE 0 END) AS customers_25pct_plus,\n           SUM(CASE WHEN m_spend > 0 AND m_spend / total_spend >= 0.50 THEN 1 ELSE 0 END) AS customers_50pct_plus,\n           AVG(CASE WHEN m_spend > 0 THEN m_spend / total_spend END) AS avg_share_among_buyers\n    FROM cust WHERE total_spend > 0\n    ",
+      "ms": 31504,
+      "cached": true,
+      "ran_at": "2026-10-26T13:44:05Z",
+      "row_count": 1
+     }
+    ],
+    "rows": [
+     {
+      "customers_total": 90858,
+      "customers_who_bought": 8222,
+      "customers_25pct_plus": 87,
+      "customers_50pct_plus": 1,
+      "avg_share_among_buyers": 0.0357
+     }
+    ],
+    "scope": "Store sales channel only (catalog and web sales not included).",
+    "thresholds_used": [
+     0.25,
+     0.5,
+     25,
+     50
+    ]
+   }
+  },
+  "E6": {
+   "tool": "customer_dependence",
+   "args": {
+    "manufacturer_id": 158
+   },
+   "purpose": "Compare customer dependence for the second-ranked manufacturer.",
+   "result": {
+    "summary": "7490 customers bought from manufacturer 158; 4 relied on it for half or more of their store spend.",
+    "queries": [
+     {
+      "sql": "\n    WITH cust AS (\n      SELECT s.ss_customer_sk AS c, SUM(s.ss_ext_sales_price) AS total_spend,\n             SUM(CASE WHEN i.i_manufact_id = 158 THEN s.ss_ext_sales_price ELSE 0 END) AS m_spend\n      FROM TPCDS_DB.store_sales s JOIN TPCDS_DB.item i ON s.ss_item_sk = i.i_item_sk\n      WHERE s.ss_customer_sk IS NOT NULL\n      GROUP BY s.ss_customer_sk\n    )\n    SELECT COUNT(*) AS customers_total,\n           SUM(CASE WHEN m_spend > 0 THEN 1 ELSE 0 END) AS customers_who_bought,\n           SUM(CASE WHEN m_spend > 0 AND m_spend / total_spend >= 0.25 THEN 1 ELSE 0 END) AS customers_25pct_plus,\n           SUM(CASE WHEN m_spend > 0 AND m_spend / total_spend >= 0.50 THEN 1 ELSE 0 END) AS customers_50pct_plus,\n           AVG(CASE WHEN m_spend > 0 THEN m_spend / total_spend END) AS avg_share_among_buyers\n    FROM cust WHERE total_spend > 0\n    ",
+      "ms": 33847,
+      "cached": false,
+      "ran_at": "2026-10-27T07:54:27Z",
+      "row_count": 1
+     }
+    ],
+    "rows": [
+     {
+      "customers_total": 90858,
+      "customers_who_bought": 7490,
+      "customers_25pct_plus": 97,
+      "customers_50pct_plus": 4,
+      "avg_share_among_buyers": 0.0376
+     }
+    ],
+    "scope": "Store sales channel only (catalog and web sales not included).",
+    "thresholds_used": [
+     0.25,
+     0.5,
+     25,
+     50
+    ]
+   }
+  },
+  "E7": {
+   "tool": "geographic_exposure",
+   "args": {
+    "manufacturer_id": 207
+   },
+   "purpose": "Check revenue by store state and customer state to find geographic concentration risks.",
+   "result": {
+    "summary": "Manufacturer 207 sells through stores in 1 state(s); top customer states listed.",
+    "queries": [
+     {
+      "sql": "\n    SELECT st.s_state AS store_state, COUNT(DISTINCT st.s_store_sk) AS stores,\n           SUM(s.ss_ext_sales_price) AS revenue\n    FROM TPCDS_DB.store_sales s\n    JOIN TPCDS_DB.item i ON s.ss_item_sk = i.i_item_sk\n    JOIN TPCDS_DB.store st ON s.ss_store_sk = st.s_store_sk\n    WHERE i.i_manufact_id = 207\n    GROUP BY st.s_state ORDER BY revenue DESC LIMIT 15\n    ",
+      "ms": 43087,
+      "cached": true,
+      "ran_at": "2026-10-26T13:44:48Z",
+      "row_count": 1
+     },
+     {
+      "sql": "\n    SELECT ca.ca_state AS customer_state, COUNT(DISTINCT s.ss_customer_sk) AS customers,\n           SUM(s.ss_ext_sales_price) AS revenue\n    FROM TPCDS_DB.store_sales s\n    JOIN TPCDS_DB.item i ON s.ss_item_sk = i.i_item_sk\n    JOIN TPCDS_DB.customer_address ca ON s.ss_addr_sk = ca.ca_address_sk\n    WHERE i.i_manufact_id = 207\n    GROUP BY ca.ca_state ORDER BY revenue DESC LIMIT 15\n    ",
+      "ms": 44456,
+      "cached": true,
+      "ran_at": "2026-10-26T13:45:32Z",
+      "row_count": 15
+     }
+    ],
+    "rows": [],
+    "scope": "Store sales channel only (catalog and web sales not included).",
+    "by_store_state": [
+     {
+      "store_state": "TN",
+      "stores": 6,
+      "revenue": 16470405.78
+     }
+    ],
+    "by_customer_state": [
+     {
+      "customer_state": "TX",
+      "customers": 660,
+      "revenue": 1303967.15
+     },
+     {
+      "customer_state": "GA",
+      "customers": 431,
+      "revenue": 917653.52
+     },
+     {
+      "customer_state": "KY",
+      "customers": 364,
+      "revenue": 688031.18
+     },
+     {
+      "customer_state": "VA",
+      "customers": 356,
+      "revenue": 646166.23
+     },
+     {
+      "customer_state": "NC",
+      "customers": 309,
+      "revenue": 627280.58
+     },
+     {
+      "customer_state": "KS",
+      "customers": 303,
+      "revenue": 579254.31
+     },
+     {
+      "customer_state": "IA",
+      "customers": 267,
+      "revenue": 556587.38
+     },
+     {
+      "customer_state": "IL",
+      "customers": 270,
+      "revenue": 543227.92
+     },
+     {
+      "customer_state": "TN",
+      "customers": 231,
+      "revenue": 522274.77
+     },
+     {
+      "customer_state": "NE",
+      "customers": 267,
+      "revenue": 501984.22
+     },
+     {
+      "customer_state": "IN",
+      "customers": 236,
+      "revenue": 485402.5
+     },
+     {
+      "customer_state": "MO",
+      "customers": 272,
+      "revenue": 485036.04
+     },
+     {
+      "customer_state": null,
+      "customers": 270,
+      "revenue": 465716.08
+     },
+     {
+      "customer_state": "MI",
+      "customers": 232,
+      "revenue": 457722.89
+     },
+     {
+      "customer_state": "MN",
+      "customers": 232,
+      "revenue": 431480.51
+     }
+    ]
+   }
+  },
+  "E8": {
+   "tool": "diversification_candidates",
+   "args": {
+    "manufacturer_id": 207
+   },
+   "purpose": "Find other manufacturers in the same product classes as manufacturer 207.",
+   "result": {
+    "summary": "Other manufacturers selling in the same classes as 207 (top 2 per class). Candidates only: capacity to replace is NOT shown by the data.",
+    "queries": [
+     {
+      "sql": "\n    WITH classes AS (SELECT DISTINCT i_category, i_class FROM TPCDS_DB.item WHERE i_manufact_id = 207),\n    other AS (\n      SELECT i.i_category AS cat, i.i_class AS cls, i.i_manufact_id AS alt_id, i.i_manufact AS alt_name,\n             SUM(s.ss_ext_sales_price) AS revenue\n      FROM TPCDS_DB.store_sales s\n      JOIN TPCDS_DB.item i ON s.ss_item_sk = i.i_item_sk\n      JOIN classes c ON i.i_category = c.i_category AND i.i_class = c.i_class\n      WHERE i.i_manufact_id <> 207\n      GROUP BY i.i_category, i.i_class, i.i_manufact_id, i.i_manufact\n    ), ranked AS (\n      SELECT *, ROW_NUMBER() OVER (PARTITION BY cat, cls ORDER BY revenue DESC) AS rn,\n             COUNT(*) OVER (PARTITION BY cat, cls) AS other_manufacturers\n      FROM other\n    )\n    SELECT cat AS category, cls AS class, other_manufacturers, alt_id AS candidate_id,\n           alt_name AS candidate, revenue AS candidate_revenue\n    FROM ranked WHERE rn <= 2\n    ORDER BY other_manufacturers ASC, category, class, rn\n    LIMIT 30\n    ",
+      "ms": 35890,
+      "cached": true,
+      "ran_at": "2026-10-26T13:46:09Z",
+      "row_count": 30
+     }
+    ],
+    "rows": [
+     {
+      "category": "Sports",
+      "class": "sailing",
+      "other_manufacturers": 91,
+      "candidate_id": 77,
+      "candidate": "ationation",
+      "candidate_revenue": 1079515.2
+     },
+     {
+      "category": "Sports",
+      "class": "sailing",
+      "other_manufacturers": 91,
+      "candidate_id": 575,
+      "candidate": "antiationanti",
+      "candidate_revenue": 722255.93
+     },
+     {
+      "category": "Electronics",
+      "class": "portable",
+      "other_manufacturers": 92,
+      "candidate_id": 511,
+      "candidate": "oughtoughtanti",
+      "candidate_revenue": 1015592.39
+     },
+     {
+      "category": "Electronics",
+      "class": "portable",
+      "other_manufacturers": 92,
+      "candidate_id": 220,
+      "candidate": "barableable",
+      "candidate_revenue": 880983.56
+     },
+     {
+      "category": "Jewelry",
+      "class": "birdal",
+      "other_manufacturers": 92,
+      "candidate_id": 273,
+      "candidate": "priationable",
+      "candidate_revenue": 852573.88
+     },
+     {
+      "category": "Jewelry",
+      "class": "birdal",
+      "other_manufacturers": 92,
+      "candidate_id": 377,
+      "candidate": "ationationpri",
+      "candidate_revenue": 783877.19
+     },
+     {
+      "category": "Electronics",
+      "class": "automotive",
+      "other_manufacturers": 94,
+      "candidate_id": 87,
+      "candidate": "ationeing",
+      "candidate_revenue": 762213.1
+     },
+     {
+      "category": "Electronics",
+      "class": "automotive",
+      "other_manufacturers": 94,
+      "candidate_id": 167,
+      "candidate": "ationcallyought",
+      "candidate_revenue": 708086.86
+     },
+     {
+      "category": "Sports",
+      "class": "tennis",
+      "other_manufacturers": 94,
+      "candidate_id": 186,
+      "candidate": "callyeingought",
+      "candidate_revenue": 863416.73
+     },
+     {
+      "category": "Sports",
+      "class": "tennis",
+      "other_manufacturers": 94,
+      "candidate_id": 481,
+      "candidate": "oughteingese",
+      "candidate_revenue": 708333.72
+     },
+     {
+      "category": "Electronics",
+      "class": "scanners",
+      "other_manufacturers": 96,
+      "candidate_id": 3,
+      "candidate": "pri",
+      "candidate_revenue": 796766.87
+     },
+     {
+      "category": "Electronics",
+      "class": "scanners",
+      "other_manufacturers": 96,
+      "candidate_id": 78,
+      "candidate": "eingation",
+      "candidate_revenue": 759963.04
+     },
+     {
+      "category": "Home",
+      "class": "decor",
+      "other_manufacturers": 97,
+      "candidate_id": 148,
+      "candidate": "eingeseought",
+      "candidate_revenue": 901048.54
+     },
+     {
+      "category": "Home",
+      "class": "decor",
+      "other_manufacturers": 97,
+      "candidate_id": 232,
+      "candidate": "ablepriable",
+      "candidate_revenue": 739327.95
+     },
+     {
+      "category": "Books",
+      "class": "cooking",
+      "other_manufacturers": 99,
+      "candidate_id": 979,
+      "candidate": "n stationn st",
+      "candidate_revenue": 849313.73
+     },
+     {
+      "category": "Books",
+      "class": "cooking",
+      "other_manufacturers": 99,
+      "candidate_id": 9,
+      "candidate": "n st",
+      "candidate_revenue": 669648.33
+     },
+     {
+      "category": "Books",
+      "class": "parenting",
+      "other_manufacturers": 101,
+      "candidate_id": 72,
+      "candidate": "ableation",
+      "candidate_revenue": 1151288.25
+     },
+     {
+      "category": "Books",
+      "class": "parenting",
+      "other_manufacturers": 101,
+      "candidate_id": 137,
+      "candidate": "ationpriought",
+      "candidate_revenue": 1023372.24
+     },
+     {
+      "category": "Jewelry",
+      "class": "rings",
+      "other_manufacturers": 101,
+      "candidate_id": 243,
+      "candidate": "prieseable",
+      "candidate_revenue": 831915.38
+     },
+     {
+      "category": "Jewelry",
+      "class": "rings",
+      "other_manufacturers": 101,
+      "candidate_id": 228,
+      "candidate": "eingableable",
+      "candidate_revenue": 710371.58
+     },
+     {
+      "category": "Electronics",
+      "class": "wireless",
+      "other_manufacturers": 103,
+      "candidate_id": 48,
+      "candidate": "eingese",
+      "candidate_revenue": 929507.74
+     },
+     {
+      "category": "Electronics",
+      "class": "wireless",
+      "other_manufacturers": 103,
+      "candidate_id": 266,
+      "candidate": "callycallyable",
+      "candidate_revenue": 757607.23
+     },
+     {
+      "category": "Jewelry",
+      "class": "costume",
+      "other_manufacturers": 103,
+      "candidate_id": 63,
+      "candidate": "prically",
+      "candidate_revenue": 723744.13
+     },
+     {
+      "category": "Jewelry",
+      "class": "costume",
+      "other_manufacturers": 103,
+      "candidate_id": 199,
+      "candidate": "n stn stought",
+      "candidate_revenue": 675594.98
+     },
+     {
+      "category": "Sports",
+      "class": "camping",
+      "other_manufacturers": 105,
+      "candidate_id": 7,
+      "candidate": "ation",
+      "candidate_revenue": 1009356.39
+     },
+     {
+      "category": "Sports",
+      "class": "camping",
+      "other_manufacturers": 105,
+      "candidate_id": 631,
+      "candidate": "oughtprically",
+      "candidate_revenue": 811784.91
+     },
+     {
+      "category": "Electronics",
+      "class": "cameras",
+      "other_manufacturers": 106,
+      "candidate_id": 542,
+      "candidate": "ableeseanti",
+      "candidate_revenue": 616601.61
+     },
+     {
+      "category": "Electronics",
+      "class": "cameras",
+      "other_manufacturers": 106,
+      "candidate_id": 87,
+      "candidate": "ationeing",
+      "candidate_revenue": 613523.59
+     },
+     {
+      "category": "Books",
+      "class": "home repair",
+      "other_manufacturers": 109,
+      "candidate_id": 181,
+      "candidate": "oughteingought",
+      "candidate_revenue": 909945.5
+     },
+     {
+      "category": "Books",
+      "class": "home repair",
+      "other_manufacturers": 109,
+      "candidate_id": 244,
+      "candidate": "eseeseable",
+      "candidate_revenue": 725480.84
+     }
+    ],
+    "scope": "Store sales channel only (catalog and web sales not included)."
+   }
+  }
+ },
+ "conclusion": {
+  "action": "final",
+  "critical_manufacturer_id": 207,
+  "critical_manufacturer": "oughtcallyese",
+  "conclusion": "Manufacturer 207 exhibits the most dangerous hidden dependency: it has the highest receipt_reach (0.0387) among top manufacturers (E3) yet represents only 0.32% of total revenue (E3), making its supply impact disproportionate to its size. One customer relies on it for 50%+ of their store spend (E5), and it sells across 37 product classes with no sole-source classes but high class diversification risk (E4). Its stores are concentrated in a single state (TN, 6 stores, $16.47M revenue) (E7) while customers span at least 15 states plus a null-state group (270 customers, $465.7K revenue) (E7), creating geographic exposure. Compared to manufacturer 158, which has receipt_reach 0.035 and revenue_share 0.0031 (E3) with 4 customers at >=50% reliance (E6), manufacturer 207\u2019s combination of top receipt_reach, minimal revenue share, and broad class presence makes it the highest hidden risk.",
+  "why": [
+   "Manufacturer 207 ranks #1 in receipt_reach at 0.0387 (E3) and revenue_share 0.0032 (E3) across 240,000 total receipts, yet its revenue share is only 0.32% of total store sales ($16.9M of $5.14B), confirming a hidden dependency (E3).",
+   "One customer relies on manufacturer 207 for half or more of their store spend (customers_50pct_plus = 1 out of 90,858 total customers) (E5).",
+   "Manufacturer 207 sells in 37 named product classes plus 1 blank category/class gap (E4), spreading risk across many categories without being the sole maker of any single class, which amplifies disruption potential if any class faces supply interruption (E4).",
+   "Geographic exposure: stores limited to Tennessee (6 stores, $16.47M revenue) (E7), but customer states include TX, GA, KY, VA, NC, KS, IA, IL, TN, NE, IN, MO, MI, MN, plus a null-state group (270 customers, $465.7K revenue) (E7), creating store-concentration vs. customer-dispersion risk (E7).",
+   "Manufacturer 158 has receipt_reach 0.035 and revenue_share 0.0031 (E3) with 4 customers at >=50% reliance on its products (E6), but manufacturer 207\u2019s receipt_reach is higher relative to its revenue footprint, making its dependency more hidden given the disproportionate receipt reach compared to revenue share (E3, E6)."
+  ],
+  "recommendations": [
+   "Investigate supply continuity for manufacturer 207\u2019s top 3 revenue-generating classes (reference, pants, costume jewelry) as they represent the highest class-level shares (E4).",
+   "Assess TN-based distribution resilience and consider redistributing stock or onboarding alternative TN/non-TN suppliers to reduce geographic concentration (E7).",
+   "Engage the 1 customer representing >=50% spend to understand their criticality and develop dual-sourcing options (E5).",
+   "Monitor the blank-class data gap (E4) and ensure no real sole-source dependencies are masked by categorization issues.",
+   "Explore diversification candidates in manufacturer 207\u2019s classes (E8) as potential alternative sources, but do not assume they have capacity to replace 207 based on revenue numbers alone."
+  ],
+  "limitations": [
+   "All results cover the store sales channel only; catalog and web sales are excluded (E2).",
+   "Manufacturer names are inconsistent in the data; identification relies on manufacturer_id (E3\u2013E8).",
+   "One product class for manufacturer 207 has a blank category/class, which is a data gap, not a real class (E4).",
+   "Geographic exposure shows customer_state = null for 270 customers generating $465.7K revenue, indicating unrecorded or aggregated state data (E7).",
+   "Diversification candidates (E8) are listed by class but their actual production capacity, lead times, or ability to replace manufacturer 207 are not quantified by the data."
+  ]
+ },
+ "approved": true,
+ "open_issues": []
+}

@@ -1,0 +1,33 @@
+{
+ "engine": "Meterless World Model Agent Engine v1.0 (ChainGuard implementation)",
+ "schema_version": 1,
+ "wired": {
+  "ingest": "every Zetaris tool result (agent._run_tool)",
+  "canonical_reconstruction": "entities()/relationships() rebuilt from observations.jsonl",
+  "context_builder": "Investigator start (prior runs), Explainer ('Why?'), Simulator",
+  "control_plane": "GET /api/world/health, GET /api/world/manufacturer/{id}, `python run.py world`"
+ },
+ "not_implemented": [
+  "enrichment jobs",
+  "supervisor/maintenance agent",
+  "merge detection",
+  "bitemporal edges",
+  "H-MEM memory tiers"
+ ],
+ "health": {
+  "schema_version": 1,
+  "observations": 36,
+  "runs": 4,
+  "entities": 112,
+  "entities_by_type": {
+   "time_window": 1,
+   "manufacturer": 55,
+   "data_gap": 3,
+   "product_class": 37,
+   "store_state": 1,
+   "customer_state": 15
+  },
+  "relationships": 83,
+  "orphan_relationships": 0
+ }
+}

@@ -1,0 +1,227 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ChainGuard</title>
+<style>
+  :root { --bg:#0f1419; --panel:#171e26; --line:#26313d; --text:#e6edf3; --muted:#8b98a5;
+          --accent:#4fb3ff; --ok:#3fb950; --warn:#d29922; --bad:#f85149; }
+  * { box-sizing: border-box; }
+  body { margin:0; background:var(--bg); color:var(--text); font:15px/1.5 system-ui, -apple-system, Segoe UI, sans-serif; }
+  header { padding:20px 24px; border-bottom:1px solid var(--line); display:flex; align-items:baseline; gap:14px; flex-wrap:wrap; }
+  header h1 { margin:0; font-size:22px; } header span { color:var(--muted); }
+  main { max-width:1100px; margin:0 auto; padding:20px 16px 60px; display:grid; gap:18px; }
+  .panel { background:var(--panel); border:1px solid var(--line); border-radius:10px; padding:16px 18px; }
+  .row { display:flex; gap:10px; flex-wrap:wrap; }
+  input[type=text] { flex:1; min-width:240px; background:#0b1015; color:var(--text); border:1px solid var(--line);
+          border-radius:8px; padding:10px 12px; font-size:15px; }
+  button { background:var(--accent); color:#05121f; border:0; border-radius:8px; padding:10px 16px; font-weight:600; cursor:pointer; }
+  button.secondary { background:transparent; color:var(--accent); border:1px solid var(--accent); }
+  button:disabled { opacity:.5; cursor:wait; }
+  h2 { margin:0 0 10px; font-size:16px; } h3 { margin:14px 0 6px; font-size:14px; color:var(--muted); text-transform:uppercase; letter-spacing:.04em; }
+  .step { border-left:3px solid var(--line); padding:6px 10px; margin:6px 0; }
+  .step.Zetaris { border-color:var(--accent); } .step.Evaluator { border-color:var(--warn); } .step.Investigator { border-color:#a371f7; }
+  .who { font-weight:600; } .meta { color:var(--muted); font-size:13px; }
+  .badge { display:inline-block; font-size:12px; padding:1px 7px; border-radius:20px; border:1px solid var(--line); color:var(--muted); margin-left:6px; }
+  .badge.ok { color:var(--ok); border-color:var(--ok); } .badge.bad { color:var(--bad); border-color:var(--bad); }
+  details { margin-top:4px; } summary { cursor:pointer; color:var(--muted); font-size:13px; }
+  pre { white-space:pre-wrap; word-break:break-word; background:#0b1015; padding:8px; border-radius:6px; font-size:12px; max-height:320px; overflow:auto; }
+  .eid { color:var(--accent); cursor:pointer; text-decoration:underline dotted; }
+  ul { margin:4px 0; padding-left:20px; } li { margin:3px 0; }
+  .big { font-size:20px; font-weight:700; } .hidden { display:none; }
+  table { border-collapse:collapse; width:100%; font-size:13px; } td, th { border-bottom:1px solid var(--line); padding:4px 6px; text-align:left; }
+  .scroll { overflow-x:auto; }
+  .note { color:var(--muted); font-size:13px; }
+  .working { display:flex; gap:14px; align-items:center; background:#0b1015; border:1px solid var(--line); border-radius:8px; padding:12px 14px; margin-top:12px; }
+  .spinner { width:22px; height:22px; flex:none; border:3px solid var(--line); border-top-color:var(--accent); border-radius:50%; animation:spin .9s linear infinite; }
+  @keyframes spin { to { transform:rotate(360deg); } }
+</style>
+</head>
+<body>
+<header><h1>ChainGuard</h1><span>Explainable supply-chain resilience, grounded in Zetaris data</span></header>
+<main>
+  <section class="panel">
+    <div class="row">
+      <input id="q" type="text" value="Find the most dangerous hidden dependency in our supply chain.">
+      <button id="go">Investigate</button>
+      <button class="secondary" id="loadBtn">Load last investigation</button>
+    </div>
+    <p class="note">Every number comes from live Zetaris queries. Model calls go through Meterless Nightshift (NVIDIA Nemotron). Results describe historical exposure, not forecasts.</p>
+  </section>
+
+  <section class="panel hidden" id="feedPanel">
+    <h2>Investigation <span id="runStatus" class="badge"></span></h2>
+    <div id="feed"></div>
+    <div id="working"></div>
+  </section>
+
+  <section class="panel hidden" id="resultPanel">
+    <h2>Conclusion <span id="evalBadge" class="badge"></span></h2>
+    <div class="big" id="critical"></div>
+    <p id="conclusion"></p>
+    <h3>Why (evidence-backed)</h3><ul id="why"></ul>
+    <h3>Recommended first actions</h3><ul id="recs"></ul>
+    <h3>Limitations</h3><ul id="limits"></ul>
+    <div class="row" style="margin-top:14px">
+      <button class="secondary" id="whyBtn">Why?</button>
+      <button id="simBtn">Simulate supplier failure</button>
+    </div>
+    <div id="whyOut" class="hidden" style="margin-top:14px"></div>
+  </section>
+
+  <section class="panel hidden" id="simPanel">
+    <h2>Simulated unavailability: historical exposure</h2>
+    <div id="simOut"></div>
+  </section>
+
+  <section class="panel hidden" id="evidencePanel">
+    <h2 id="evTitle">Evidence</h2>
+    <div id="evOut"></div>
+  </section>
+</main>
+<script>
+const $ = id => document.getElementById(id);
+let runId = null, result = null, poll = null;
+const esc = s => String(s ?? "").replace(/[&<>]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;"}[c]));
+const cite = s => esc(s).replace(/\bE(\d+)\b/g, '<span class="eid" data-e="E$1">E$1</span>');
+
+function working(el, message) {
+  const started = Date.now();
+  el.innerHTML = `<div class="working"><div class="spinner"></div><div><div class="msg">${esc(message)}</div>
+    <div class="note"><span class="elapsed">0:00</span> elapsed · this can take a few minutes, please keep this page open</div></div></div>`;
+  const tick = () => { const s = Math.floor((Date.now() - started) / 1000);
+    const t = el.querySelector(".elapsed"); if (t) t.textContent = `${Math.floor(s / 60)}:${String(s % 60).padStart(2, "0")}`; };
+  const timer = setInterval(tick, 1000);
+  return { set: m => { const x = el.querySelector(".msg"); if (x) x.textContent = m; }, stop: () => { clearInterval(timer); el.innerHTML = ""; } };
+}
+
+function stageText(events) {
+  const e = events[events.length - 1];
+  if (!e) return "Starting the investigation…";
+  switch (e.action) {
+    case "question": case "context": return "Nemotron is planning the first step…";
+    case "model_reply": return "Nemotron has decided; preparing the next step…";
+    case "decide": return `Querying Zetaris: ${e.tool}… (large queries can take up to a minute)`;
+    case "tool_result": return "Recording the result in the World Model…";
+    case "ingest": return "Nemotron is reading the result and deciding what to check next…";
+    case "tool_error": return "A query failed; Nemotron is choosing another way…";
+    case "draft_conclusion": return "The Evaluator is checking every number and citation against the evidence…";
+    case "review": return e.approved ? "Approved. Preparing the conclusion…" : "The Evaluator sent the draft back; the Investigator is revising…";
+    default: return "ChainGuard is working…";
+  }
+}
+
+function table(rows) {
+  if (!rows || !rows.length) return "";
+  const cols = Object.keys(rows[0]);
+  return '<div class="scroll"><table><tr>' + cols.map(c => `<th>${esc(c)}</th>`).join("") + "</tr>" +
+    rows.map(r => "<tr>" + cols.map(c => `<td>${esc(r[c])}</td>`).join("") + "</tr>").join("") + "</table></div>";
+}
+
+function renderEvent(e) {
+  let body = "";
+  if (e.action === "decide") body = `calls <b>${esc(e.tool)}</b> ${esc(JSON.stringify(e.args||{}))}<div class="meta">${esc(e.note)}</div>`;
+  else if (e.action === "tool_result") {
+    body = `<b>${esc(e.evidence_id)}</b> ${esc(e.note)}`;
+    (e.queries||[]).forEach(q => body += `<details><summary>SQL · ${q.row_count} rows · ${(q.ms/1000).toFixed(1)}s${q.cached?" · cached result from "+esc(q.ran_at):""}</summary><pre>${esc(q.sql)}</pre></details>`);
+  }
+  else if (e.action === "tool_error") body = `<span style="color:var(--bad)">${esc(e.error)}</span>`;
+  else if (e.action === "review") body = (e.approved ? '<span class="badge ok">approved</span>' : '<span class="badge bad">sent back</span>') +
+    (e.issues && e.issues.length ? "<ul>" + e.issues.map(i => `<li>${esc(i)}</li>`).join("") + "</ul>" : "");
+  else body = esc(e.note || "");
+  const model = e.model ? `<span class="badge">${esc(e.model)}</span>` : "";
+  return `<div class="step ${esc(e.agent)}"><span class="who">${esc(e.agent)}</span> <span class="meta">${esc(e.action)}</span>${model}<div>${body}</div></div>`;
+}
+
+function showEvidence(eid) {
+  const ev = result && result.evidence && result.evidence[eid];
+  if (!ev) return;
+  $("evidencePanel").classList.remove("hidden");
+  $("evTitle").textContent = `Evidence ${eid}: ${ev.tool}`;
+  const r = ev.result;
+  let html = `<p>${esc(r.summary)}</p><p class="note">${esc(r.scope)}</p>`;
+  html += table(r.rows);
+  ["by_store_state","by_customer_state"].forEach(k => { if (r[k]) html += `<h3>${k.replace(/_/g," ")}</h3>` + table(r[k]); });
+  (r.queries||[]).forEach(q => html += `<details><summary>SQL (${q.row_count} rows, ran ${esc(q.ran_at)})</summary><pre>${esc(q.sql)}</pre></details>`);
+  $("evOut").innerHTML = html;
+  $("evidencePanel").scrollIntoView({behavior:"smooth"});
+}
+document.addEventListener("click", ev => { const e = ev.target.closest(".eid"); if (e) showEvidence(e.dataset.e); });
+
+function renderResult(inv) {
+  result = inv;
+  const c = inv.conclusion || {};
+  $("resultPanel").classList.remove("hidden");
+  $("critical").textContent = `${c.critical_manufacturer || "?"} (manufacturer id ${c.critical_manufacturer_id ?? "?"})`;
+  $("conclusion").innerHTML = cite(c.conclusion);
+  $("why").innerHTML = (c.why||[]).map(w => `<li>${cite(w)}</li>`).join("");
+  $("recs").innerHTML = (c.recommendations||[]).map(w => `<li>${cite(w)}</li>`).join("");
+  $("limits").innerHTML = (c.limitations||[]).map(w => `<li>${cite(w)}</li>`).join("");
+  $("evalBadge").className = "badge " + (inv.approved ? "ok" : "bad");
+  $("evalBadge").textContent = inv.approved ? "Evaluator approved" : "Evaluator not satisfied: see open issues in the log";
+  $("simBtn").textContent = `Simulate ${c.critical_manufacturer || "supplier"} becoming unavailable`;
+}
+
+function watch(id) {
+  runId = id; $("go").disabled = true; $("loadBtn").disabled = true;
+  $("feedPanel").classList.remove("hidden"); $("runStatus").textContent = "running";
+  const w = working($("working"), "Starting the investigation…");
+  const step = async () => {
+    const s = await fetch(`/api/runs/${runId}`).then(r => r.json());
+    $("feed").innerHTML = s.events.map(renderEvent).join("");
+    $("runStatus").textContent = s.status;
+    w.set(stageText(s.events));
+    if (s.status !== "running") {
+      clearInterval(poll); w.stop(); $("go").disabled = false; $("loadBtn").disabled = false;
+      if (s.error) $("feed").innerHTML += `<div class="step"><span style="color:var(--bad)">Error: ${esc(s.error)}</span></div>`;
+      if (s.result) renderResult(s.result);
+    }
+  };
+  step(); poll = setInterval(step, 2000);
+}
+
+$("go").onclick = async () => {
+  $("feed").innerHTML = "";
+  ["resultPanel","simPanel","evidencePanel"].forEach(p => $(p).classList.add("hidden"));
+  const r = await fetch("/api/investigate", {method:"POST", headers:{"Content-Type":"application/json"},
+                         body: JSON.stringify({question: $("q").value})}).then(r => r.json());
+  watch(r.run_id);
+};
+
+$("loadBtn").onclick = async () => {
+  const r = await fetch("/api/latest");
+  if (!r.ok) { alert("No saved investigation yet."); return; }
+  ["resultPanel","simPanel","evidencePanel"].forEach(p => $(p).classList.add("hidden"));
+  watch((await r.json()).run_id);
+};
+
+$("whyBtn").onclick = async () => {
+  $("whyBtn").disabled = true; $("whyOut").classList.remove("hidden");
+  const busy = working($("whyOut"), "Nemotron is explaining the conclusion from the stored evidence and the World Model…");
+  const w = await fetch("/api/why", {method:"POST", headers:{"Content-Type":"application/json"}, body: JSON.stringify({run_id: runId})}).then(r => r.json());
+  busy.stop();
+  $("whyOut").innerHTML = `<h3>Why? <span class="badge">${esc(w.model)}</span></h3><p>${cite(w.answer)}</p>` +
+    (w.unsupported_numbers && w.unsupported_numbers.length ? `<p class="note">Check: numbers not found in evidence: ${esc(w.unsupported_numbers.join(", "))}</p>` : '<p class="note">All numbers matched to evidence.</p>');
+  $("whyBtn").disabled = false;
+};
+
+$("simBtn").onclick = async () => {
+  const m = result && result.conclusion && result.conclusion.critical_manufacturer_id;
+  if (m == null) return;
+  $("simBtn").disabled = true; $("simPanel").classList.remove("hidden");
+  const busy = working($("simOut"), "Querying Zetaris for historical exposure, then Nemotron summarises the impact…");
+  const s = await fetch("/api/simulate", {method:"POST", headers:{"Content-Type":"application/json"},
+                        body: JSON.stringify({run_id: runId, manufacturer_id: Number(m)})}).then(r => r.json());
+  busy.stop();
+  Object.assign(result.evidence, s.evidence || {});
+  let html = `<div class="big">${cite(s.headline)}</div><span class="badge">${esc(s.model)}</span>`;
+  html += "<h3>Potential impact based on observed data</h3><ul>" + (s.impact||[]).map(i => `<li>${cite(i)}</li>`).join("") + "</ul>";
+  html += "<h3>What to do first</h3><ul>" + (s.first_actions||[]).map(i => `<li>${cite(i)}</li>`).join("") + "</ul>";
+  html += "<h3>Caveats</h3><ul>" + (s.caveats||[]).map(i => `<li>${cite(i)}</li>`).join("") + "</ul>";
+  Object.entries(s.evidence||{}).forEach(([eid, ev]) => html += `<h3>${eid}: ${esc(ev.tool)}</h3>` + table(ev.result.rows));
+  $("simOut").innerHTML = html; $("simBtn").disabled = false;
+};
+</script>
+</body>
+</html>

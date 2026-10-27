@@ -1,0 +1,8 @@
+.env.local
+.env
+__pycache__/
+.pytest_cache/
+data/
+logs/*.jsonl
+.venv/
+*.zip
